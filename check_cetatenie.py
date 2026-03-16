@@ -1,4 +1,5 @@
 import requests
+import time
 from bs4 import BeautifulSoup
 from io import BytesIO
 from pypdf import PdfReader
@@ -14,8 +15,8 @@ SEARCH_TEXT = [
 ]
 
 # Telegram: используем переменные окружения
-BOT_TOKEN = os.environ.get("BOT_TOKEN")  # добавь в Secrets GitHub или в систему
-CHAT_IDS = os.environ.get("CHAT_IDS", "")  # список через запятую: "3868227762,12345678"
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+CHAT_IDS = os.environ.get("CHAT_IDS", "")
 CHAT_IDS = [c.strip() for c in CHAT_IDS.split(",") if c.strip()]
 
 LAST_DATE_FILE = "last_date.txt"
@@ -53,7 +54,19 @@ def save_last_date(date):
 # ---------------- ПОЛУЧЕНИЕ ПОСЛЕДНЕЙ ДАТЫ ----------------
 
 def get_latest_pdfs():
-    r = session.get(URL, timeout=30)
+    max_retries = 5
+    for attempt in range(max_retries):
+        try:
+            r = session.get(URL, timeout=30)
+            r.raise_for_status()
+            break
+        except Exception as e:
+            print(f"Attempt {attempt+1}/{max_retries} failed for {URL}: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(10)
+            else:
+                raise
+
     soup = BeautifulSoup(r.text, "html.parser")
 
     latest_date = None
@@ -79,7 +92,19 @@ def get_latest_pdfs():
 # ---------------- ПРОВЕРКА PDF ----------------
 
 def check_pdf(url):
-    r = session.get(url, timeout=60)
+    max_retries = 5
+    for attempt in range(max_retries):
+        try:
+            r = session.get(url, timeout=60)
+            r.raise_for_status()
+            break
+        except Exception as e:
+            print(f"Attempt {attempt+1}/{max_retries} failed for PDF {url}: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(5)
+            else:
+                return []  # пропускаем этот PDF если все попытки не удались
+
     reader = PdfReader(BytesIO(r.content))
     text = ""
     for page in reader.pages:
