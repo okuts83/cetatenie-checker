@@ -27,4 +27,4 @@ jobs:
         run: pip install requests beautifulsoup4 pypdf
 
       - name: Run Cetatenie script
-        run: python check_cetatenie.py
+        run: run: TZ=Europe/Chisinau python check_cetatenie.py
