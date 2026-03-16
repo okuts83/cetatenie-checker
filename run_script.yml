@@ -1,0 +1,38 @@
+name: Cetatenie Checker
+
+on:
+  schedule:
+    - cron: '0 20 * * *'
+  workflow_dispatch:
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Restore last_date cache
+        uses: actions/cache@v4
+        with:
+          path: last_date.txt
+          key: cetatenie-date-cache
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install libraries
+        run: pip install requests beautifulsoup4
+
+      - name: Run script
+        run: python check_cetatenie.py
+
+      - name: Save last_date cache
+        uses: actions/cache@v4
+        with:
+          path: last_date.txt
+          key: cetatenie-date-cache
+
