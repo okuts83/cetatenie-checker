@@ -1,38 +1,30 @@
-name: Cetatenie Checker
+name: Cetatenie Checker Daily
 
+# Запуск каждый день в 22:00 Румыния (UTC+2/3)
 on:
   schedule:
-    - cron: '0 10 * * *'
-  workflow_dispatch:
+    - cron: '0 11 * * *'  # 20:00 UTC ≈ 22:00 в Румынии
+  workflow_dispatch:      # возможность запускать вручную
 
 jobs:
   run-script:
     runs-on: ubuntu-latest
 
+    env:
+      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      CHAT_IDS: ${{ secrets.CHAT_IDS }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Restore last_date cache
-        uses: actions/cache@v4
-        with:
-          path: last_date.txt
-          key: cetatenie-date-cache
-
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install libraries
-        run: pip install requests beautifulsoup4
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 pypdf
 
-      - name: Run script
+      - name: Run Cetatenie script
         run: python check_cetatenie.py
-
-      - name: Save last_date cache
-        uses: actions/cache@v4
-        with:
-          path: last_date.txt
-          key: cetatenie-date-cache
-
