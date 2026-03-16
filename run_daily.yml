@@ -3,7 +3,7 @@ name: Cetatenie Checker Daily
 # Запуск каждый день в 22:00 Румыния (UTC+2/3)
 on:
   schedule:
-    - cron: '0 11 * * *'  # 20:00 UTC ≈ 22:00 в Румынии
+    - cron: '0 13 * * *'  # 20:00 UTC ≈ 22:00 в Румынии
   workflow_dispatch:      # возможность запускать вручную
 
 jobs:
